@@ -3,6 +3,22 @@ import torch.nn as nn
 from torch.nn import functional as F
 import math
 
+
+class KScheduler:
+    def __init__(self, initial_k, final_k, total_steps, warmup_fraction=0.5):
+        self.initial_k = initial_k
+        self.final_k = final_k
+        self.total_steps = total_steps
+        self.warmup_steps = int(total_steps * warmup_fraction)
+        
+    def get_k(self, step):
+        if step >= self.warmup_steps:
+            return self.final_k
+        # Linear decay from initial_k to final_k
+        progress = step / self.warmup_steps
+        return int(self.initial_k + (self.final_k - self.initial_k) * progress)
+
+    
 class SparseAutoencoder(nn.Module):
     def __init__(
         self,
@@ -12,11 +28,13 @@ class SparseAutoencoder(nn.Module):
         auxk=256,
         dead_steps_threshold=10_000_000,
         data_geometric_median=None,
+        tied_weights = False
     ):
         super().__init__()
-
+        self.tied_weights = tied_weights
         self.w_enc = nn.Parameter(torch.empty(d_model, d_hidden))
-        self.w_dec = nn.Parameter(torch.empty(d_hidden, d_model))
+        if not tied_weights:
+            self.w_dec = nn.Parameter(torch.empty(d_hidden, d_model))
 
         self.b_enc = nn.Parameter(torch.zeros(d_hidden))
         self.b_pre = nn.Parameter(torch.zeros(d_model))
@@ -35,14 +53,24 @@ class SparseAutoencoder(nn.Module):
 
         # tied init
         nn.init.kaiming_uniform_(self.w_enc, a=math.sqrt(5))
-        self.w_dec.data = self.w_enc.data.T.clone()
-        self.w_dec.data /= self.w_dec.data.norm(dim=0)
+        if not tied_weights:
+            self.w_dec.data = self.w_enc.data.T.clone()
+            self.w_dec.data /= self.w_dec.data.norm(dim=0)
 
         # Initialize dead neuron tracking
         self.register_buffer(
             "stats_last_nonzero", torch.zeros(d_hidden, dtype=torch.long)
         )
-
+        
+        self.isTied = True
+    
+    @property
+    def decoder_weights(self):
+        """Get decoder weights - either tied (encoder.T) or untied"""
+        if self.tied_weights:
+            return self.w_enc.T
+        return self.w_dec
+    
     def topK_activation(self, x, k):
         topk = torch.topk(x, k=k, dim=-1, sorted=False)
         values = F.relu(topk.values)
@@ -74,7 +102,7 @@ class SparseAutoencoder(nn.Module):
         dead_mask = self.auxk_mask_fn()
         num_dead = dead_mask.sum().item()
 
-        recons = latents @ self.w_dec + self.b_pre
+        recons = latents @ self.decoder_weights + self.b_pre
         recons = recons * std + mu
 
         if num_dead > 0:
@@ -83,7 +111,7 @@ class SparseAutoencoder(nn.Module):
             auxk_latents = torch.where(dead_mask[None], pre_acts, -torch.inf)
             auxk_acts = self.topK_activation(auxk_latents, k=k_aux)
 
-            auxk = auxk_acts @ self.w_dec + self.b_pre
+            auxk = auxk_acts @ self.decoder_weights + self.b_pre
             auxk = auxk * std + mu
         else:
             auxk = None
@@ -100,18 +128,21 @@ class SparseAutoencoder(nn.Module):
         for feat in features:
             latents[:, feat["feat_index"]] = feat["val"]
 
-        recons = latents @ self.w_dec + self.b_pre
+        recons = latents @ self.decoder_weights + self.b_pre
         recons = recons * std + mu
         return recons
 
     @torch.no_grad()
     def norm_weights(self):
-        self.w_dec.data /= self.w_dec.data.norm(dim=0)
+        if not self.tied_weights:
+            self.w_dec.data /= self.w_dec.data.norm(dim=0)
 
     @torch.no_grad()
     def norm_grad(self):
-        dot_products = torch.sum(self.w_dec.data * self.w_dec.grad, dim=0)
-        self.w_dec.grad.sub_(self.w_dec.data * dot_products.unsqueeze(0))
+        if not self.tied_weights:
+            dot_products = torch.sum(self.w_dec.data * self.w_dec.grad, dim=0)
+            self.w_dec.grad.sub_(self.w_dec.data * dot_products.unsqueeze(0))
+
 
     @torch.no_grad()
     def get_acts(self, x):
@@ -120,3 +151,4 @@ class SparseAutoencoder(nn.Module):
         pre_acts = x @ self.w_enc + self.b_enc
         latents = self.topK_activation(pre_acts, self.k)
         return latents
+    
