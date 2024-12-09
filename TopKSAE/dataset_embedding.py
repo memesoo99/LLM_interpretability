@@ -4,7 +4,7 @@ import glob
 from typing import List, Dict, Any
 
 class EmbeddingDataset(Dataset):
-    def __init__(self, path, file_pattern, use_files = 40):
+    def __init__(self, path, file_pattern, use_files = -1):
         # Load all `.pt` files based on the pattern
         self.file_path = path
         self.files = sorted(glob.glob(path+"/"+file_pattern))
@@ -13,7 +13,9 @@ class EmbeddingDataset(Dataset):
         self.data = []
 
         # Read and store all embeddings from all files
-        for file in self.files[:use_files]:
+        if use_files != -1:
+            self.files = self.files[:use_files]
+        for file in self.files:
             batch_data = torch.load(file)
             # Extract embeddings and flatten them into a list
             self.data.extend([item["embedding"] for item in batch_data])
