@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Analysis Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            max-width: 1352px; /* Limit the overall width */
+            margin: 0 auto; /* Center the content horizontally */
+            overflow-x: hidden; /* Prevent horizontal scrolling for the body */
+            padding: 20px; /* Add padding for better spacing */
+        }
+
+
+        .wrapper {
+            display: flex;
+            flex-direction: row;
+            width: 100%; /* Ensure it respects the body's width */
+            max-width: 1100px; /* Prevent it from exceeding the body's width */
+        }
+
+        .container {
+            flex: 3;
+            margin: 10px; /* Reduce margin for better fitting */
+            background: #fff;
+            padding: 15px; /* Adjust padding */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 80%; /* Ensure it doesn't overflow */
+        }
+
+        .content {
+            display: flex;
+            flex: 1;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 1;
+            max-width: 200px;
+            background: #f1f1f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007BFF;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            resize: vertical;
+            height: 100px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .sidebar label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .sidebar input {
+            width: 100%;
+            padding: 8px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #results {
+            margin-top: 30px;
+            background: #f1f1f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            max-width: 100%; /* Prevent the container from growing beyond its parent */
+            width: 100%; /* Ensure the container fills the available width */
+            height: auto; /* Allow the container to adjust height automatically */
+            overflow-x: auto; /* Add a horizontal scrollbar for overflowing content */
+            overflow-y: hidden; /* Disable vertical scrolling */
+            white-space: nowrap; /* Prevent content from wrapping to new lines */
+            display: block; /* Ensure proper block-level behavior */
+        }
+
+        #output {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.5;
+            white-space: nowrap; /* Prevent line breaks within the content */
+            overflow-x: auto; /* Ensure horizontal scrolling for overflowing content */
+            display: inline-block; /* Prevent the element from growing to fit its content */
+        }
+
+        #results h2 {
+            font-size: 1.5rem;
+            color: #333;
+            /* margin-bottom: 10px; */
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            width: 100%;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: auto; /* Push footer to the bottom */
+        }
+
+        footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%; /* Position above the label */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out;
+            width: 200px; /* Set a fixed width for the tooltip box */
+            text-align: center; /* Center-align the text */
+            word-wrap: break-word; /* Ensure long words wrap */
+            z-index: 1000;
+        }
+
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out;
+            z-index: 1000;
+        }
+
+        .tooltip:hover::after,
+        .tooltip:hover::before {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container" style="margin-left:50px;">
+            <h1>
+                <a href="/" style="text-decoration: none; color: #007BFF;">Feature Analysis Tool with SAE</a>
+            </h1>
+            <p>Analyze the features of your sentences.</p>
+            <p>Enter one sentence per line, then click "Analyze" to view the results.</p>
+            <form id="analyze-form">
+                <textarea id="sentences" name="sentences" placeholder="Enter sentences here..."></textarea>
+                <button type="submit">Analyze</button>
+            </form>
+            <div id="results">
+                <h2>Results:</h2>
+                <div id="output">
+                    Analysis will appear here.
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="sidebar">
+            <h3>Settings</h3>
+            <form id="settings-form">
+                <label for="activation-threshold" class="tooltip" data-tooltip="The minimum activation strength (from range 0~1) required to consider a feature">
+                    Activation Threshold:
+                </label>
+                <input type="number" id="activation-threshold" name="activation-threshold" step="0.1" value="0.7" min="0" max="1">
+                
+                <label for="num-activations" class="tooltip" data-tooltip="The ratio of activations required among input sentences">
+                    Num Activations:
+                </label>
+                <input type="number" id="num-activations" name="num-activations" step="0.1" value="0.8" min="0" max="1">
+        
+                <label for="display-n" class="tooltip" data-tooltip="The number of features to display in the results. (-1 : display all)">
+                    Display N:
+                </label>
+                <input type="number" id="display-n" name="display-n" value="5" min="1">
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        Made with ❤️ by <a href="https://yourwebsite.com" target="_blank">us</a>.
+    </footer>
+
+    <script>
+        document.getElementById('analyze-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent the form from refreshing the page
+    
+            // Get the sentences from the textarea
+            const sentences = document.getElementById('sentences').value.split('\n').filter(s => s.trim());
+            if (sentences.length === 0) {
+                alert("Please enter at least one sentence.");
+                return;
+            }
+    
+            // Get the settings from the sidebar
+            const activationThreshold = parseFloat(document.getElementById('activation-threshold').value);
+            const numActivations = parseFloat(document.getElementById('num-activations').value);
+            const displayN = parseInt(document.getElementById('display-n').value, 10);
+    
+            try {
+                // Send a POST request to the /analyze endpoint
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sentences: sentences,
+                        activation_threshold: activationThreshold,
+                        num_activations: numActivations,
+                        display_n: displayN
+                    }),
+                });
+    
+                // Check if the response is okay
+                if (response.ok) {
+                    // Get the HTML response and display it in the output div
+                    const html = await response.text();
+                    document.getElementById('output').innerHTML = html;
+                } else {
+                    // Handle errors returned by the server
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.error}`);
+                }
+            } catch (error) {
+                // Handle any network or unexpected errors
+                console.error("Error occurred:", error);
+                alert("An error occurred while processing your request. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>

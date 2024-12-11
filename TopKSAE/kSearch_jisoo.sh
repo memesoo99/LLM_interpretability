@@ -10,7 +10,7 @@ LEARNING_RATE=1e-4
 
 # Array of k values to test
 # k_values=(24 48 64 100 128 256)
-k_values=(24 48)
+k_values=(6 12)
 
 # Create a directory for this batch of experiments
 BATCH_DIR="${HIDDEN_DIM_MULT}x_k_comparison_$(date +%Y%m%d_%H%M%S)"

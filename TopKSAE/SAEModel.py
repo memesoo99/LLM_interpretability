@@ -26,7 +26,7 @@ class SparseAutoencoder(nn.Module):
         d_hidden,
         k=128,
         auxk=256,
-        dead_steps_threshold=10_000_000,
+        dead_steps_threshold=1_000_000,
         data_geometric_median=None,
         tied_weights = False
     ):
@@ -52,7 +52,7 @@ class SparseAutoencoder(nn.Module):
             self.b_pre.data = torch.load(data_geometric_median)
 
         # tied init
-        nn.init.kaiming_uniform_(self.w_enc, a=math.sqrt(5))
+        nn.init.kaiming_normal_(self.w_enc, mode='fan_out', nonlinearity='relu')
         if not tied_weights:
             self.w_dec.data = self.w_enc.data.T.clone()
             self.w_dec.data /= self.w_dec.data.norm(dim=0)
