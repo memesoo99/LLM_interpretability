@@ -72,7 +72,7 @@ class EmbeddingDataset(Dataset):
         return self.data[idx]
 
 # Define your dataset
-file_pattern = "residual_data_batch_*.pt"  # Adjust the path if needed
+file_pattern = "*residual_data_batch_*.pt"  # Adjust the path if needed
 path = "./dataset/"
 embedding_dataset = EmbeddingDataset(path, file_pattern)
 
