@@ -24,12 +24,22 @@ Once enough residual dataset is created, train SparseAutoEncoder with the data.
 Configure DATASET_PATH to the path of your dataset.
 For phi, set INPUT_DIM=3072, HIDDEN_DIM_MULT=4
 For mistral, set INPUT_DIM=4096, HIDDEN_DIM_MULT=100
+Sample training scripts are located under `run`
 
 ```
+bash run/kSearch_1.sh
 bash run/kSearch_1.sh
 ```
 
 ## 3. Interpret SAE representation
+### SAE Model Checkpoints
+https://drive.google.com/drive/folders/1rWP7qHyvks7Bnl_1ibQSc2xzdmERhGPW?usp=sharing
+With SAE checkpoints ready, now you can run a flask web server to visualize activations intuitively.
+```
+python server.py
+# The server should run at 127.0.0.1:5000 by default
+```
+![SAE Web Demo](demp.png)
 
 
 
