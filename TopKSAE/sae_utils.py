@@ -11,7 +11,8 @@ def parse_args():
     
     # Model parameters
     parser.add_argument('--input_dim', type=int, default=3072, help='Input dimension')
-    parser.add_argument('--hidden_dim_multiplier', type=int, default=4, help='Multiplier for hidden dimension (hidden_dim = input_dim * multiplier)')
+    # default 4 for phi, 100 for mistral
+    parser.add_argument('--hidden_dim_multiplier', type=int, default=100, help='Multiplier for hidden dimension (hidden_dim = input_dim * multiplier)')
     parser.add_argument('--k', type=int, default=48, help='Number of active neurons (suggested: input_dim/64)')
     parser.add_argument('--dead_steps_threshold', type=int, default=10000000, help='Steps threshold for dead neuron detection')
     
