@@ -15,7 +15,7 @@ batch_size = 1
 samples_per_file = 1000
 max_samples = 20000
 model_type = "phi"
-model_type= "mistral"
+# model_type= "mistral"
 
 data_full = []
 file_count = 1
@@ -34,8 +34,8 @@ elif model_type == "mistral":
     tokenizer = MistralTokenizer.v1()
 
 ## 2. Dataset to extract residual
-# ds = load_dataset("tatsu-lab/alpaca")
-ds = load_dataset("monology/pile-uncopyrighted", data_files="train/00.jsonl.zst", split="train")
+ds = load_dataset("tatsu-lab/alpaca")
+# ds = load_dataset("monology/pile-uncopyrighted", data_files="train/00.jsonl.zst", split="train")
 
 ## Residual Hook Function
 def gather_residual_activations(model, target_layer, inputs):

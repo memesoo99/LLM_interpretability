@@ -10,6 +10,20 @@ We demonstrate results using [MSFT Phi3 mini 128k Instruct](https://huggingface.
 | Claude 3 Sonnet                     | 175B (100%) | 88.7         |
 
 
+# Getting Started
+## 1. Dataset Creation
+First, you need to create a dataset of residual activations to train your SAE.
+Select model type between `Phi-3-mini-4k-instruct` or `mistralai/Mistral-7B-Instruct-v0.2` and choose your text data.
+(The default setting lets you extract the residual stream from the 16th layer.)
+```
+python anthropicDataCreate.py
+```
+
+## 2. Train SAE
+Once enough residual dataset is created, train SparseAutoEncoder with the data.
+
 # Experiments
 ## TopK SAE
 We replace the normal SAE with L1 regularisation for more stable training. 
+
+
