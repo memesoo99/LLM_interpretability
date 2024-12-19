@@ -53,8 +53,9 @@ We performed two key experiments on our phi-SAE:
 
 ### 1. K Scheduler Results
 <p align="center">
-  <img src="imgs/k_scheduling.png" alt="SAE K Scheduler" style="max-width: 70%; height: auto;">
+  <img src="imgs/k_scheduling.png" alt="SAE K Scheduler" width="60%">
 </p>
+
 
 
 
@@ -73,7 +74,7 @@ We also compared the validation loss for different K values:
 
 
 <p align="center">
-  <img src="imgs/k_val.png" alt="SAE K Scheduler" style="max-width: 10%; height: auto;">
+  <img src="imgs/k_val.png" alt="SAE K Scheduler" width="60%">
 </p>
 
 Smaller K values like 24, 48 exhibited higher validation losses, while larger K values stabilized faster and achieve lower overall losses. 
