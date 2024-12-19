@@ -38,7 +38,7 @@ With SAE checkpoints ready, now you can run a flask web server to visualize acti
 python server.py
 # The server should run at 127.0.0.1:5000 by default
 ```
-![SAE Web Demo](demp.png)
+![SAE Web Demo](demo.png)
 
 
 
