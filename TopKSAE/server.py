@@ -39,16 +39,14 @@ model = AutoModelForCausalLM.from_pretrained(model_name, token=access_token, dev
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=access_token)
 
 # Load SAE model
-if 'sae_model' in globals() and sae_model is not None:
-    del sae_model
-    torch.cuda.empty_cache()  # Clear the GPU memory
+# if 'sae_model' in globals() and sae_model is not None:
+#     del sae_model
+#     torch.cuda.empty_cache()  # Clear the GPU memory
 
 input_dim = 4096  # Input and output dimensions
 hidden_dim = input_dim * 100  # Hidden layer dimension
 K = 12
 state_dict = torch.load("/workspace/LLM_interpretability/TopKSAE/experiments/100x_k_comparison_20241209_032005/mistral_pile_k12_experiment_20241209/models/model_epoch_20.pt")
-# state_dict = torch.load("/workspace/LLM_interpretability/TopKSAE/experiments/100x_k_comparison_20241209_005036/mistral_pile_k24_experiment_20241209/models/model_epoch_25.pt")
-# state_dict = torch.load("/workspace/LLM_interpretability/TopKSAE/experiments/100x_k_comparison_20241210_043339/mistral_pile_k24_experiment_20241210/models/model_epoch_30.pt")
 
 # Load the weights into the model
 sae_model = SparseAutoencoder(input_dim, hidden_dim, k = K, dead_steps_threshold=1000000) # initial lambda is 0
