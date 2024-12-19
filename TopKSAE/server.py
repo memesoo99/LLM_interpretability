@@ -30,55 +30,42 @@ from eval_utils import sentence_heatmap_visualization_with_activations, analyze_
 # Flask app initialization
 app = Flask(__name__)
 
-# from dotenv import load_dotenv
-# load_dotenv()
 
-### 1. custom mistral
-# # Retrieve the Hugging Face token
+
+### 1. Load Mistral model and Mistral SAE
+
 # access_token = os.getenv("HF_TOKEN")
+
+## Load LLM Model
 # model_name = "mistralai/Mistral-7B-Instruct-v0.2"
 # model = AutoModelForCausalLM.from_pretrained(model_name, token=access_token, device_map="cuda")
+
+## Load Tokenizer
 # tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=access_token)
 
-# Load SAE model
-# if 'sae_model' in globals() and sae_model is not None:
-#     del sae_model
-#     torch.cuda.empty_cache()  # Clear the GPU memory
-
+## Load SAE Model
 # input_dim = 4096  # Input and output dimensions
 # hidden_dim = input_dim * 100  # Hidden layer dimension
 # K = 12
 # state_dict = torch.load("/workspace/LLM_interpretability/TopKSAE/experiments/100x_k_comparison_20241209_032005/mistral_pile_k12_experiment_20241209/models/model_epoch_20.pt")
 
 # SAE_PATH = "tylercosgrove/mistral-7b-sparse-autoencoder-layer16"
-# # Load the weights into the model
 # sae_model = SparseAutoencoder(input_dim, hidden_dim, k = K, dead_steps_threshold=1000000) # initial lambda is 0
 # sae_model.load_state_dict(state_dict)
 # sae_model.to('cuda')
 
 
-# access_token = os.getenv("HF_TOKEN")
-# model_name = "mistralai/Mistral-7B-Instruct-v0.2"
-# model = AutoModelForCausalLM.from_pretrained(model_name, token=access_token, device_map="cuda")
-# tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=access_token)
-
-### 2. sae lens
+### 2. Load Mistral from tylercosgrove (sae lens)
 device = 'cuda'
 SAE_PATH = "tylercosgrove/mistral-7b-sparse-autoencoder-layer16"
-# SAE_PATH = "/workspace/LLM_interpretability/TopKSAE/mistral-7b-sparse-autoencoder-layer16/sae_weights.safetensors"
-# state_dict = torch.load(SAE_PATH)
-# sae_model = SparseAutoencoder(input_dim, hidden_dim, k = K, dead_steps_threshold=1000000) # initial lambda is 0
-# sae_model.load_state_dict(state_dict)
-# sae_model.to('cuda')
 
 sae_model, cfg_dict, sparsity = SAE.from_pretrained(
     release = SAE_PATH,
     sae_id = ".",
     device = device
 )
-# print(sae_model)
 
-access_token = "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"
+access_token = os.getenv("HF_TOKEN")
 model_name = "mistralai/Mistral-7B-Instruct-v0.2"
 model = AutoModelForCausalLM.from_pretrained(model_name, token=access_token, device_map="cuda")
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=access_token)
