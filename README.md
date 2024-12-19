@@ -12,19 +12,19 @@ We demonstrate results using [MSFT Phi3 mini 128k Instruct](https://huggingface.
 
 ## Getting Started
 ### 1. Dataset Creation
-First, you need to create a dataset of residual activations to train your SAE.
-Select model type between `Phi-3-mini-4k-instruct` or `Mistral-7B-Instruct-v0.2` and choose your text data.
+First, you need to create a dataset of residual activations to train your SAE.<br>
+Select model type between `Phi-3-mini-4k-instruct` or `Mistral-7B-Instruct-v0.2` and choose your text data.<br>
 (The default setting lets you extract the residual stream from the 16th layer.)
 ```
 python anthropicDataCreate.py
 ```
 
 ### 2. Train SAE
-Once enough residual dataset is created, train SparseAutoEncoder with the data.
-Configure DATASET_PATH to the path of your dataset.
-For phi, set INPUT_DIM=3072, HIDDEN_DIM_MULT=4
-For mistral, set INPUT_DIM=4096, HIDDEN_DIM_MULT=100
-Sample training scripts are located under `run`
+Once enough residual dataset is created, train SparseAutoEncoder with the data.<br>
+Configure `DATASET_PATH` to the path of your dataset.<br>
+For phi, set `INPUT_DIM=3072, HIDDEN_DIM_MULT=4`<br>
+For mistral, set `INPUT_DIM=4096, HIDDEN_DIM_MULT=100`<br>
+Sample training scripts are located under `run` folder
 
 ```
 bash run/kSearch_phi.sh
@@ -33,7 +33,7 @@ bash run/kSearch_mistral.sh
 
 ### 3. Interpret SAE representation
 #### [SAE Model Checkpoints](https://drive.google.com/drive/folders/1rWP7qHyvks7Bnl_1ibQSc2xzdmERhGPW?usp=sharing)
-With SAE checkpoints ready, now you can run a flask web server to visualize activations intuitively.
+With SAE checkpoints ready, now you can run a flask web server to visualize activations and interact.
 ```
 python server.py
 # The server should run at 127.0.0.1:5000 by default
