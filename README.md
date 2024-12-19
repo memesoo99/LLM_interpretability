@@ -52,7 +52,10 @@ We performed two key experiments on our phi-SAE:
 2. Evaluating the impact of K Scheduler on training.
 
 ### 1. K Scheduler Results
-![SAE K Scheduler](imgs/k_scheduling.png){ width=60% }
+<p align="center">
+  <img src="imgs/k_scheduling.png" alt="SAE K Scheduler" style="max-width: 70%; height: auto;">
+</p>
+
 
 
 | Method                  | Dead Neurons |
@@ -68,6 +71,9 @@ Using K scheduling significantly reduces the number of dead neurons, ensuring be
 ### 2. K vs Validation Loss
 We also compared the validation loss for different K values:
 
-![SAE K val_loss](imgs/k_val.png){ width=60% }
+
+<p align="center">
+  <img src="imgs/k_val.png" alt="SAE K Scheduler" style="max-width: 10%; height: auto;">
+</p>
 
 Smaller K values like 24, 48 exhibited higher validation losses, while larger K values stabilized faster and achieve lower overall losses. 
