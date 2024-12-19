@@ -38,12 +38,35 @@ With SAE checkpoints ready, now you can run a flask web server to visualize acti
 python server.py
 # The server should run at 127.0.0.1:5000 by default
 ```
-![SAE Web Demo](demo.png)
+![SAE Web Demo](imgs/demo.png)
 
 
 
-# Experiments
-## TopK SAE
-We replace the normal SAE with L1 regularisation for more stable training. 
+# Results
+## TopK SAE Results
+
+Unlike normal SAE, TopK SAE directly controls the sparsity of activations, removing the need for $L1$ regularization. This eliminates challenges like activation collapse (dead neurons), ensuring stable training.
+
+We performed two key experiments on our phi-SAE:
+1. Testing various values of K.
+2. Evaluating the impact of K Scheduler on training.
+
+### 1. K Scheduler Results
+![SAE K Scheduler](imgs/k_scheduling.png)
+
+| Method                  | Dead Neurons |
+|-------------------------|--------------|
+| **With K scheduling**   | 15400        |
+| **Without K scheduling**| 27997        |
+
+Using K scheduling significantly reduces the number of dead neurons, ensuring better utilization of the network’s capacity.
 
 
+---
+
+### 2. K vs Validation Loss
+We also compared the validation loss for different K values:
+
+![SAE K val_loss](imgs/k_val.png)
+
+Smaller K values like 24, 48 exhibited higher validation losses, while larger K values stabilized faster and achieve lower overall losses. 
