@@ -23,7 +23,7 @@ sample_count = 0
 
 access_token = os.environ.get('ACCESS_TOKEN') 
 
-## 1. Model and Tokenizer Selectin
+## 1. Model and Tokenizer Selection
 if model_type == "phi":
     model_name = "microsoft/Phi-3-mini-4k-instruct" #3.8
     model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", torch_dtype="auto", trust_remote_code=True, attn_implementation='eager')
@@ -78,7 +78,7 @@ for i in range(0, len(ds['train']), 1):
     except:
         continue
     # Save batch to disk every 5,000 samples
-    if sample_count % samples_per_file == 0 and data_batch:
+    if sample_count % samples_per_file == 0: # and data_batch:
         torch.save(data_full, f"./dataset/residual_data_batch_{file_count}.pt")
         print(f"Done with {file_count} files")
         data_full = []
