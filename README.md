@@ -21,6 +21,17 @@ python anthropicDataCreate.py
 
 ## 2. Train SAE
 Once enough residual dataset is created, train SparseAutoEncoder with the data.
+Configure DATASET_PATH to the path of your dataset.
+For phi, set INPUT_DIM=3072, HIDDEN_DIM_MULT=4
+For mistral, set INPUT_DIM=4096, HIDDEN_DIM_MULT=100
+
+```
+bash run/kSearch_1.sh
+```
+
+## 3. Interpret SAE representation
+
+
 
 # Experiments
 ## TopK SAE
