@@ -260,31 +260,38 @@
                 <label for="display-n" class="tooltip" data-tooltip="The number of features to display in the results. (-1 : display all)">
                     Display N:
                 </label>
-                <input type="number" id="display-n" name="display-n" value="5" min="1">
+                <input type="number" id="display-n" name="display-n" value="3" min="1">
             </form>
         </div>
     </div>
 
     <footer>
-        Made with ❤️ by <a href="https://yourwebsite.com" target="_blank">us</a>.
+        <!-- Made by team </a>. -->
     </footer>
 
     <script>
+
         document.getElementById('analyze-form').addEventListener('submit', async (e) => {
             e.preventDefault(); // Prevent the form from refreshing the page
-    
-            // Get the sentences from the textarea
-            const sentences = document.getElementById('sentences').value.split('\n').filter(s => s.trim());
+
+            // Get the text from the textarea
+            let text = document.getElementById('sentences').value;
+
+            // Split the text by semicolons first, then further split by newlines
+            let sentences = text.split(';').flatMap(sentence => sentence.split('\n')).filter(s => s.trim());
+
             if (sentences.length === 0) {
                 alert("Please enter at least one sentence.");
                 return;
             }
-    
+
+            console.log("Parsed sentences:", sentences);
+
             // Get the settings from the sidebar
             const activationThreshold = parseFloat(document.getElementById('activation-threshold').value);
             const numActivations = parseFloat(document.getElementById('num-activations').value);
             const displayN = parseInt(document.getElementById('display-n').value, 10);
-    
+
             try {
                 // Send a POST request to the /analyze endpoint
                 const response = await fetch('/analyze', {
@@ -299,7 +306,7 @@
                         display_n: displayN
                     }),
                 });
-    
+
                 // Check if the response is okay
                 if (response.ok) {
                     // Get the HTML response and display it in the output div
@@ -316,6 +323,54 @@
                 alert("An error occurred while processing your request. Please try again.");
             }
         });
+
+
+        // document.getElementById('analyze-form').addEventListener('submit', async (e) => {
+        //     e.preventDefault(); // Prevent the form from refreshing the page
+    
+        //     // Get the sentences from the textarea
+        //     const sentences = document.getElementById('sentences').value.split('\n').filter(s => s.trim());
+        //     if (sentences.length === 0) {
+        //         alert("Please enter at least one sentence.");
+        //         return;
+        //     }
+
+        //     // Get the settings from the sidebar
+        //     const activationThreshold = parseFloat(document.getElementById('activation-threshold').value);
+        //     const numActivations = parseFloat(document.getElementById('num-activations').value);
+        //     const displayN = parseInt(document.getElementById('display-n').value, 10);
+    
+        //     try {
+        //         // Send a POST request to the /analyze endpoint
+        //         const response = await fetch('/analyze', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify({
+        //                 sentences: sentences,
+        //                 activation_threshold: activationThreshold,
+        //                 num_activations: numActivations,
+        //                 display_n: displayN
+        //             }),
+        //         });
+    
+        //         // Check if the response is okay
+        //         if (response.ok) {
+        //             // Get the HTML response and display it in the output div
+        //             const html = await response.text();
+        //             document.getElementById('output').innerHTML = html;
+        //         } else {
+        //             // Handle errors returned by the server
+        //             const errorData = await response.json();
+        //             alert(`Error: ${errorData.error}`);
+        //         }
+        //     } catch (error) {
+        //         // Handle any network or unexpected errors
+        //         console.error("Error occurred:", error);
+        //         alert("An error occurred while processing your request. Please try again.");
+        //     }
+        // });
     </script>
 </body>
 </html>
