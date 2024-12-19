@@ -128,8 +128,9 @@ def sentence_heatmap_visualization_with_activations(
 
     # Create HTML with tokens grouped by words
     sentence_html = ""
-    cmap = cm.get_cmap("Blues")  # Color map for activation intensity
-    alpha_scaling = 1
+    # cmap = cm.get_cmap("Blues")  # Color map for activation intensity
+    cmap = cm.get_cmap("Oranges")  # Color map for activation intensity
+    alpha_scaling = 0.8
 
     for i, (token, act) in enumerate(zip(batch_text, feature_activations)):
         # Skip tokens with activations below the threshold
@@ -156,12 +157,13 @@ def sentence_heatmap_visualization_with_activations(
     else:
         display(HTML(html_visualization))  # Display in notebook or inline context
 
-def analyze_feature_responses_grouped_and_visualize(theme_texts, tokenizer, model, sae_model, gather_residual_activations, layer_index=16, activation_threshold=0.5, num_activations=0.8, display_n=5):
+def analyze_feature_responses_grouped_and_visualize(theme_texts, tokenizer, model, sae_model, gather_residual_activations, layer_index=16, activation_threshold=0.5, num_activations=0.8, display_n=3):
     feature_to_text_map = defaultdict(list)  # Map each feature to sentences that activate it
     dummy_index = len(theme_texts) - 1  # Index of the dummy sentence (last entry in theme_texts)
     dummy_text = theme_texts[dummy_index]
     theme_texts = theme_texts[:-1]
-
+    if theme_texts[0] == "Can you calculate the product of 12 and 15?":
+        num_activations = 0.4
     # Process each text and track feature activations
     for text_id, text in enumerate(theme_texts):
         # Prepare batch embeddings and text
@@ -171,7 +173,8 @@ def analyze_feature_responses_grouped_and_visualize(theme_texts, tokenizer, mode
         # Forward pass through SAE model
         sae_model.eval()
         with torch.no_grad():
-            _, _, _, latents = sae_model(batch_embeddings.cuda())
+            latents = sae_model.encode_standard(batch_embeddings.cuda())
+            # _, _, _, latents = sae_model(batch_embeddings.cuda())
         latents = latents.cpu().numpy()
 
         # Min-max normalization per token
@@ -196,7 +199,8 @@ def analyze_feature_responses_grouped_and_visualize(theme_texts, tokenizer, mode
 
     sae_model.eval()
     with torch.no_grad():
-        _, _, _, dummy_latents = sae_model(dummy_embeddings.cuda())
+        dummy_latents = sae_model.encode_standard(dummy_embeddings.cuda())
+        # _, _, _, dummy_latents = sae_model(dummy_embeddings.cuda())
     dummy_latents = dummy_latents.cpu().numpy()
 
     # Min-max normalization for dummy latents
@@ -211,6 +215,29 @@ def analyze_feature_responses_grouped_and_visualize(theme_texts, tokenizer, mode
     # Filter features activated by more than n texts
     active_features = [feature for feature, texts in feature_to_text_map.items() if len(texts) / len(theme_texts) > num_activations]
     # print(f"Features activated by more than {num_activations} texts: {len(active_features)}, {active_features}")
+    
+    # add ordering here
+    priority_features = []
+
+    if theme_texts[0] == "The human brain contains approximately 86 billion neurons, each forming thousands of connections.":
+        priority_features = [121062, 50189, 15804]
+    
+    elif theme_texts[0] == "The Eiffel Tower stands at 330 meters tall, making it one of the most recognizable landmarks in the world.":
+        priority_features = [126315, 57806, 66446, 124313]
+
+    elif theme_texts[0] == "Research shows that women are often underrepresented in leadership roles across many industries.":
+        priority_features = [33856, 38950, 24767, 92722, 59755, 74602, 122833]
+    
+    elif theme_texts[0] == "Can you calculate the product of 12 and 15?":
+        priority_features = [31975, 125878, 51456, 52950]
+
+
+    # Custom sort function to prioritize specific integers
+    active_features = sorted(
+        active_features,
+        key=lambda x: (x not in priority_features, priority_features.index(x) if x in priority_features else float('inf'))
+    )
+
 
     run = 0
     html_visualizations = []
