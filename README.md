@@ -11,6 +11,12 @@ We demonstrate results using [MSFT Phi3 mini 128k Instruct](https://huggingface.
 
 
 ## Getting Started
+### 0. Set Environments
+Before running the project, ensure you install the necessary dependencies. Use the following command to install all the required Python packages:
+```bash
+pip install -r requirements.txt
+```
+
 ### 1. Dataset Creation
 First, you need to create a dataset of residual activations to train your SAE.<br>
 Select model type between `Phi-3-mini-4k-instruct` or `Mistral-7B-Instruct-v0.2` and choose your text data.<br>
