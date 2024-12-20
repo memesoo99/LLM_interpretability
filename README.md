@@ -46,6 +46,9 @@ python server.py
 ```
 ![SAE Web Demo](imgs/demo.png)
 
+#### Troubleshooting
+- **GPU Requirements**: Ensure your GPU has sufficient memory to load both the SAE checkpoint and the Mistral model simultaneously. To load Mistral GPU with at least **80 GB of memory** is recommended. To load Phi model, any GPU will be acceptable.
+- **Models not loading**: Ensure you have downloaded or prepared your own checkpoint. Double-check the paths to the SAE and model checkpoint in the script.
 
 
 # Results
